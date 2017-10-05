@@ -1,0 +1,197 @@
+---
+title: "HW2_B04701204"
+author: "B04701204 邱千芷"
+output: 
+  html_document:
+    toc: yes
+  html_notebook:
+    toc: yes
+---
+###資料來源
+資料：Hubway Data — 波士頓共享單車使用數據
+
+####讀取資料
+```{r}
+Hubway_Stations <- read.csv("hubway_stations.csv")
+Hubway_Trips <- read.csv("hubway_trips.csv")
+```
+
+####資料定義
+```{r}
+# set up categorical data as factor/character variables
+Hubway_Trips$hubway_id <- as.factor(Hubway_Trips$hubway_id)
+Hubway_Trips$strt_statn <- as.character(Hubway_Trips$strt_statn) 
+Hubway_Trips$end_statn <- as.character(Hubway_Trips$end_statn) 
+Hubway_Trips$subsc_type <- as.factor(Hubway_Trips$subsc_type) 
+```
+
+##題目一:計算中短期定點借還使用時間(介於90分鐘到24小時)的平均值
+
+Hubway現行收費規定註明，年度用戶使用超過90分鐘，每30分鐘即加收6美金。本題希望透過鼓勵定點借還有效減少補車作業，以中短期定點借還使用時間的平均值為基準，提供優惠費率給定點借還時間低於平均值的用戶。
+
+####資料整理
+```{r}
+Sys.setlocale('LC_ALL','C')
+
+# 計算借還時間間隔
+Hubway_Trips$start_date <- as.POSIXct(Hubway_Trips$start_date,
+                                      format='%m/%d/%Y %H:%M:%S')
+Hubway_Trips$end_date <- as.POSIXct(Hubway_Trips$end_date,
+                                      format='%m/%d/%Y %H:%M:%S')
+Hubway_Trips$start_end <- difftime(Hubway_Trips$end_date,Hubway_Trips$start_date,units="mins")
+
+# 刪除借還無意義的資料
+Hubway_Trips <- Hubway_Trips[!(Hubway_Trips$start_end == 0), ] 
+```
+
+####資料擷取
+```{r}
+library(dplyr)
+
+# 擷取中短期定點借還用戶的資料，按照Hubway ID和借出站做統整
+ShortTerm <- Hubway_Trips %>%
+  select(hubway_id, start_end, strt_statn, end_statn) %>%
+  filter(strt_statn == end_statn & start_end > 90 & start_end < 24*60) %>%
+  group_by(hubway_id,strt_statn) %>%
+  arrange(desc(start_end))
+
+# 計算定點借還時間的平均值
+ShortTerm_mean <- mean(ShortTerm$start_end,na.rm=TRUE)
+```
+
+####資料呈現
+```{r}
+# 篩選出定點借還時間低於平均值的用戶
+ShortTerm_users <- ShortTerm %>%
+  filter(start_end < ShortTerm_mean) %>%
+  group_by(hubway_id) 
+```
+
+##題目二：找出長期借還(使用時間超過24小時)的用戶，提供方案避免包車現象
+
+以Hubway現行收費規定，使用24小時高達288美金，但仍有不少用戶占用車輛超過一天。本題希望找出這些長期借用的用戶，進一步了解包車的原因，並提供方案避免此現象再發生。
+
+####資料擷取
+```{r}
+# 擷取長期借還用戶的資料，按照Hubway ID和借出站做統整
+LongTerm <- Hubway_Trips %>%
+  select(hubway_id, start_end, strt_statn, end_statn) %>%
+  filter(start_end > 24*60) %>%
+  group_by(hubway_id,strt_statn) %>%
+  arrange(desc(start_end))
+```
+
+
+##題目三:分析不同用戶類型的借還地和附近城市區域的關係(是否有迥異的使用習慣)
+
+分析Annual和Casual用戶的借還地分布，是否可以反映出不同的使用習慣。
+
+###子題一：分析Annual用戶的借還地和居住地的關係
+
+假設Annual用戶為長期居民，分析用戶借還地是否鄰近居住地。
+
+####資料擷取
+```{r}
+# extract relevant data of casual users, group by hubway_id
+Annual_users <- Hubway_Trips %>%
+  filter(subsc_type == "Registered") %>%
+  select(hubway_id, duration, strt_statn, end_statn) %>%
+  group_by(hubway_id) 
+```
+
+###子題二：分析Casual用戶的還車地和觀光景點分布的關係
+
+假設Casual用戶為短期來訪的觀光客，分析用戶還車地是否鄰近Boston的著名觀光景點。
+
+####資料擷取
+```{r}
+# extract relevant data of casual users, group by end station
+Casual_users <- Hubway_Trips %>%
+  filter(subsc_type == "Casual") %>%
+  select(hubway_id, end_statn) %>%
+  group_by(end_statn) 
+```
+
+####資料彙整
+```{r}
+# calculate number of users who got off at end station, arrange by number
+Casual_users_dest <- summarise(Casual_users,
+                               users_destination = n())
+```
+
+####資料合併
+```{r}
+# combine relevant data with data of stations
+Casual_users_dest <- merge(Casual_users_dest, Hubway_Stations, by.x = "end_statn", by.y = "id")
+
+#arrange by number of users who got off
+Casual_users_dest <- arrange(Casual_users_dest, desc(users_destination))
+```
+
+####資料呈現
+羅列十大casual users的還車地。
+```{r}
+# list the top ten end stations for casual users
+head(Casual_users_dest, 10)
+```
+
+###繪圖
+以圖呈現十大casual users的還車地。
+```{r}
+# specify the ten stations on map
+library(rMaps)
+map <- Leaflet$new()
+map$setView(c(42.35, -71.10), zoom = 13)
+
+map$marker(
+    c(Casual_users_dest$lat[1], Casual_users_dest$lng[1]),
+    bindPopup = paste(Casual_users_dest$station[1])
+  )
+map$marker(
+    c(Casual_users_dest$lat[2], Casual_users_dest$lng[2]),
+    bindPopup = paste(Casual_users_dest$station[2])
+  )
+map$marker(
+    c(Casual_users_dest$lat[3], Casual_users_dest$lng[3]),
+    bindPopup = paste(Casual_users_dest$station[3])
+  )
+map$marker(
+    c(Casual_users_dest$lat[4], Casual_users_dest$lng[4]),
+    bindPopup = paste(Casual_users_dest$station[4])
+  )
+map$marker(
+    c(Casual_users_dest$lat[5], Casual_users_dest$lng[5]),
+    bindPopup = paste(Casual_users_dest$station[5])
+  )
+map$marker(
+    c(Casual_users_dest$lat[6], Casual_users_dest$lng[6]),
+    bindPopup = paste(Casual_users_dest$station[6])
+  )
+map$marker(
+    c(Casual_users_dest$lat[7], Casual_users_dest$lng[7]),
+    bindPopup = paste(Casual_users_dest$station[7])
+  )
+map$marker(
+    c(Casual_users_dest$lat[8], Casual_users_dest$lng[8]),
+    bindPopup = paste(Casual_users_dest$station[8])
+  )
+map$marker(
+    c(Casual_users_dest$lat[9], Casual_users_dest$lng[9]),
+    bindPopup = paste(Casual_users_dest$station[9])
+  )
+map$marker(
+    c(Casual_users_dest$lat[10], Casual_users_dest$lng[10]),
+    bindPopup = paste(Casual_users_dest$station[10])
+  )
+
+map
+```
+
+####疑問：沒辦法用for loop
+for (i in Casual_users_dest[1:10,]){
+  map$marker(
+    c(Casual_users_dest$lat[i], Casual_users_dest$lng[i]),
+    bindPopup = paste(Casual_users_dest$station[i])
+  )
+}
+map
