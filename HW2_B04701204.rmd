@@ -1,12 +1,3 @@
----
-title: "HW2_B04701204"
-author: "B04701204 邱千芷"
-output: 
-  html_document:
-    toc: yes
-  html_notebook:
-    toc: yes
----
 ###資料來源
 資料：Hubway Data — 波士頓共享單車使用數據
 
@@ -120,15 +111,13 @@ head(Casual_users_dest, 10)
 以圖呈現十大casual users的還車地。
 ```{r}
 library(rMaps)
+TenCasual = Casual_users_dest[1:10,]
 map <- Leaflet$new()
 map$setView(c(42.35, -71.10), zoom = 13)
-
-for (i in Casual_users_dest[1:10,]){
-  map$marker(
-    c(Casual_users_dest[i,6], Casual_users_dest[i,7]),
-    bindPopup = paste(Casual_users_dest[i,4])
-  )}
-
+map$marker(
+    TenCasual$lat,
+    TenCasual$lng,
+    bindPopup = TenCasual$station)
 map
 ```
 
@@ -139,18 +128,13 @@ Tourist_Attraction <- read.csv("tourist_attraction.csv")
 library(rMaps)
 map <- Leaflet$new()
 map$setView(c(42.35, -71.10), zoom = 13)
-
-
 map$marker(
     c(Tourist_Attraction[1,2], Tourist_Attraction[1,3]),
     bindPopup = paste(Tourist_Attraction[1,1])
   )
-
-for (i in Casual_users_dest[1:8,]){
-  map$marker(
-    c(Tourist_Attraction[i,2], Tourist_Attraction[i,3]),
-    bindPopup = paste(Tourist_Attraction[i,1])
-  )}
-
+map$marker(
+    Tourist_Attraction$lat,
+    Tourist_Attraction$lng,
+    bindPopup = Tourist_Attraction$touristattr)
 map
 ```
