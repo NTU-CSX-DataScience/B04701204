@@ -1,0 +1,70 @@
+---
+title: "HW 1"
+author: "B04701204"
+date: "2017/9/14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 題目：台灣大學修課時數之探討
+
+**靈感源**
+
+相較於其他國家，台灣大學修課數太長。大學法規定，課程以18小時為一學分，大學學期週數長達18週，
+遠高於各國頂尖大學的時數（美、英、日平均為15~17週，加拿大為13週）。台大早在2012年即提倡修法，開放各校自訂授課時數，然而教育部遲遲未作正面回應。本研究希望透過資料統整，以圖表呈現
+台大與各國頂尖大學的授課時數與教學成效之差異，以彰顯修法之必要。
+
+1. 天下雜誌〈葉丙成：別逼孩子吃喉糖！──台灣「學期太長！」、「學分太多！」〉
+
+    見 <http://opinion.cw.com.tw/blog/profile/215/article/1130>.
+    
+    
+2. 〈大學授課週數高於國際 台大盼修法〉  
+
+    見 <http://research.nchu.edu.tw/upfiles/ADUpload/c_epaper2399857825.pdf>.
+
+**資料源**
+
+1. 國立台灣大學大學學則
+
+    見 <http://www.aca.ntu.edu.tw/aca2012/reg/law/%E5%AD%B8%E5%89%87.pdf>.
+
+2. Academic Term by definition: Wikipedia
+
+    見 <https://en.wikipedia.org/wiki/Academic_term>.
+    
+3. American Time Use Survey
+
+    見 <https://www.bls.gov/tus/charts/students.htm>.
+    
+4. QS Graduate Employability Ranking 
+
+    見 <https://www.topuniversities.com/university-rankings/employability-rankings/2018>.
+    
+5. QS World University Ranking
+
+    見 <https://www.topuniversities.com/university-rankings/world-university-rankings/2018>
+    
+**圖表呈現形式**
+
+1. 台大與各國頂尖大學每學年授課週數/自習時間之比較（長條圖）
+
+    見 <https://opentaoyuan.gitbooks.io/r_language/content/27.png>
+
+2. 台大與各國頂尖大學學期平均每週時間規劃（圓餅圖）
+
+    見 <http://www.efoza.com/postpic/2015/06/time-management-college-students_292752.jpg>.
+    
+3. 台大與各國頂尖大學教學成效之比較：以graduate employability/ uni ranking作為基準（歷年折線圖）
+
+**異質資料新表產生** 
+
+[關鍵關聯一] 各國頂尖大學：授課時數 VS 教師平均鐘點費 （散布圖）
+
+[關鍵關聯二] 各國頂尖大學：大學排名 VS 每學年授課週數 （散布圖）
+
+[關鍵關聯三] 頂尖大學各國：工時 VS 每學年授課週數 （散布圖）
+
