@@ -1,0 +1,126 @@
+---
+title: "HW3_B04701204"
+author: "B04701204 邱千芷"
+output: 
+  html_document:
+    toc: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##題目：IMDb 2017年500大熱門電影內容呈現
+
+以文字雲呈現 IMDb 網站2017年500大熱門電影內容。
+
+### 套件安裝
+```{r install, eval=FALSE}
+install.packages('rvest')
+install.packages('NLP')
+install.packages('tm')
+install.packages('stringr')
+install.packages('wordcloud')
+install.packages('RColorBrewer')
+
+library('rvest')
+library('NLP')
+library('tm')
+library('stringr')
+library('wordcloud')
+library('RColorBrewer')
+```
+
+### 網路爬蟲
+```{r crawler, eval=FALSE}
+#Specifying the url for desired website to be scrapped
+url_100 <- 'http://www.imdb.com/search/title?count=100&release_date=2017,2017&title_type=feature&page=1&ref_=adv_nxt'
+url_200 <- 'http://www.imdb.com/search/title?count=100&release_date=2017,2017&title_type=feature&page=2&ref_=adv_nxt'
+url_300 <- 'http://www.imdb.com/search/title?count=100&release_date=2017,2017&title_type=feature&page=3&ref_=adv_nxt'
+url_400 <- 'http://www.imdb.com/search/title?count=100&release_date=2017,2017&title_type=feature&page=4&ref_=adv_nxt'
+url_500 <- 'http://www.imdb.com/search/title?count=100&release_date=2017,2017&title_type=feature&page=5&ref_=adv_nxt'
+
+#Reading the HTML code from the website
+webpage_100 <- read_html(url_100)
+webpage_200 <- read_html(url_200)
+webpage_300 <- read_html(url_300)
+webpage_400 <- read_html(url_400)
+webpage_500 <- read_html(url_500)
+
+#Using CSS selectors to scrap the description section
+description_data_html_100 <- html_nodes(webpage_100,'.text-muted+ .text-muted , .ratings-bar+ .text-muted')
+description_data_html_200 <- html_nodes(webpage_200,'.text-muted+ .text-muted , .ratings-bar+ .text-muted')
+description_data_html_300 <- html_nodes(webpage_300,'.text-muted+ .text-muted , .ratings-bar+ .text-muted')
+description_data_html_400 <- html_nodes(webpage_400,'.text-muted+ .text-muted , .ratings-bar+ .text-muted')
+description_data_html_500 <- html_nodes(webpage_500,'.text-muted+ .text-muted , .ratings-bar+ .text-muted')
+```
+
+### 文本清理
+
+先將description data轉成文字，再合併五個網頁(500大)的文字strings。
+
+```{r cleaning}
+#Converting the description data to text
+description_data_100 <- html_text(description_data_html_100)
+description_data_200 <- html_text(description_data_html_200)
+description_data_300 <- html_text(description_data_html_300)
+description_data_400 <- html_text(description_data_html_400)
+description_data_500 <- html_text(description_data_html_500)
+
+#Combine char strings
+description_data <- paste(description_data_100, description_data_200, description_data_300, description_data_400, description_data_500, sep = " ")
+```
+
+檢視經合併後的文字內容：
+
+```{r cleaning}
+#Let's have a look at the description
+head(description_data)
+```
+
+將文字內容合併成單一string並做清理：
+
+```{r cleaning}
+#Combine as one string
+description_data <- paste(description_data, collapse = " ")
+
+#Data-Preprocessing: removing '\n'
+description_data2 <- gsub("\n","",description_data)
+
+#Data-Preprocessing: removing non-words
+description_data2 <- gsub("\\W"," ",description_data2)
+
+#Data-Preprocessing: removing digits
+description_data2 <- gsub("\\d"," ",description_data2)
+
+#Data-Preprocessing: changing all to lower case
+description_data2 <- tolower(description_data2)
+
+#Data-Preprocessing: removing stopwords
+description_data2 <- removeWords(description_data2,stopwords())
+
+#Data-Preprocessing: removing single letters
+description_data2 <- gsub("\\b[A-z]\\b{1}"," ",description_data2)
+
+#Data-Preprocessing: removing irrelevant words
+description_data2 <- gsub("see"," ",description_data2)
+description_data2 <- gsub("full"," ",description_data2)
+description_data2 <- gsub("summary"," ",description_data2)
+
+#Data-Preprocessing: removing whitespaces
+description_data2 <- stripWhitespace(description_data2)
+
+#Data-Preprocessing: split up processed string into a list of separate words
+textbag <- str_split(description_data2, "\\s+")
+
+#Data-Preprocessing: unlist textbag into separate characters
+textbag <- unlist(textbag)
+```
+
+### 文字雲
+
+由文字雲可以推論，IMDb 2017年500大熱門電影最常出現的主題為家庭與生命相關情節。
+
+```{r wordcloud}
+wordcloud(textbag, min.freq = 10, random.order = FALSE, scale=c(5, 0.5), color=brewer.pal(6, "Dark2"))
+```
+
