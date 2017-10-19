@@ -4,7 +4,7 @@ author: "B04701204 邱千芷"
 output: 
   html_document:
     toc: yes
----
+--- 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -21,13 +21,18 @@ install.packages('tm')
 install.packages('stringr')
 install.packages('wordcloud')
 install.packages('RColorBrewer')
+install.packages('xml2')
+```
 
+### 套件執行
+```{r library}
 library('rvest')
 library('NLP')
 library('tm')
 library('stringr')
 library('wordcloud')
 library('RColorBrewer')
+library('xml2')
 ```
 
 ### 網路爬蟲
@@ -58,7 +63,8 @@ description_data_html_500 <- html_nodes(webpage_500,'.text-muted+ .text-muted , 
 
 先將description data轉成文字，再合併五個網頁(500大)的文字strings。
 
-```{r cleaning}
+#### 這一段有問題!! 已經下載並執行 xml2，但仍出現"Error in xml2::xml_text(x, trim = trim)"-----------------------------------
+```{r cleaning1}
 #Converting the description data to text
 description_data_100 <- html_text(description_data_html_100)
 description_data_200 <- html_text(description_data_html_200)
@@ -72,14 +78,14 @@ description_data <- paste(description_data_100, description_data_200, descriptio
 
 檢視經合併後的文字內容：
 
-```{r cleaning}
+```{r cleaning2}
 #Let's have a look at the description
 head(description_data)
 ```
 
 將文字內容合併成單一string並做清理：
 
-```{r cleaning}
+```{r cleaning3}
 #Combine as one string
 description_data <- paste(description_data, collapse = " ")
 
