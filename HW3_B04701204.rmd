@@ -15,28 +15,28 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### 套件安裝
 ```{r install, eval=FALSE}
+install.packages('xml2')
 install.packages('rvest')
 install.packages('NLP')
 install.packages('tm')
 install.packages('stringr')
 install.packages('wordcloud')
 install.packages('RColorBrewer')
-install.packages('xml2')
 ```
 
 ### 套件執行
 ```{r library}
+library('xml2')
 library('rvest')
 library('NLP')
 library('tm')
 library('stringr')
-library('wordcloud')
 library('RColorBrewer')
-library('xml2')
+library('wordcloud')
 ```
 
 ### 網路爬蟲
-```{r crawler, eval=FALSE}
+```{r crawler}
 #Specifying the url for desired website to be scrapped
 url_100 <- 'http://www.imdb.com/search/title?count=100&release_date=2017,2017&title_type=feature&page=1&ref_=adv_nxt'
 url_200 <- 'http://www.imdb.com/search/title?count=100&release_date=2017,2017&title_type=feature&page=2&ref_=adv_nxt'
