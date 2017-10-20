@@ -5,6 +5,8 @@ output:
   html_document:
     toc: yes
 --- 
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -20,8 +22,8 @@ install.packages('rvest')
 install.packages('NLP')
 install.packages('tm')
 install.packages('stringr')
-install.packages('wordcloud')
 install.packages('RColorBrewer')
+install.packages('wordcloud')
 ```
 
 ### 套件執行
@@ -63,7 +65,6 @@ description_data_html_500 <- html_nodes(webpage_500,'.text-muted+ .text-muted , 
 
 先將description data轉成文字，再合併五個網頁(500大)的文字strings。
 
-#### 這一段有問題!! 已經下載並執行 xml2，但仍出現"Error in xml2::xml_text(x, trim = trim)"-----------------------------------
 ```{r cleaning1}
 #Converting the description data to text
 description_data_100 <- html_text(description_data_html_100)
@@ -127,6 +128,6 @@ textbag <- unlist(textbag)
 由文字雲可以推論，IMDb 2017年500大熱門電影最常出現的主題為家庭與生命相關情節。
 
 ```{r wordcloud}
-wordcloud(textbag, min.freq = 10, random.order = FALSE, scale=c(5, 0.5), color=brewer.pal(6, "Dark2"))
+wordcloud(textbag, min.freq = 10, random.order = FALSE, scale=c(3.5, 0.5), color=brewer.pal(6, "Dark2"))
 ```
 
