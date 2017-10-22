@@ -35,9 +35,7 @@ require(Rfacebook)
 
 ### 網路爬蟲
 
-透過 fbOAuth function 取得 access token，再透過 token 取得歐巴馬於四段時期的發文。為減省作業，因此取百篇內的貼文。     
-
-# 後來發現因為之前取得過token並存取後，直接用load就沒有問題了，不知道這是為什麼？
+透過 `fbOAuth function` 取得 access token，再透過 token 取得歐巴馬於四段時期的發文。為減省作業，因此取百篇內的貼文。     
 
 ```{r crawler}
 # generate a 'long-lived' token using the fbOAuth function
@@ -92,7 +90,7 @@ page_Depart_post <- paste(page_Depart$message, collapse = " ")
 corpus <- c(page_PreElect_post, page_First_post, page_Second_post, page_Depart_post)
 ```
 
-清理 corpus，其中排除影響力過大且分析意義較低的自，比如網址連結中的"http"、總統名字"barack""obama"、職稱"president"。
+清理 corpus，其中排除影響力過大且分析意義較低的自，比如網址連結中的"http","OFA"、總統名字"barack","obama"、職稱"president"。
 
 ```{r cleaning2}
 #Data-Preprocessing: removing non-words
@@ -115,6 +113,7 @@ corpus2 <- stripWhitespace(corpus2)
 
 #Data-Preprocessing: removing irrelevant words
 corpus2 <- gsub("http"," ",corpus2)
+corpus2 <- gsub("ofa"," ",corpus2)
 corpus2 <- gsub("barack"," ",corpus2)
 corpus2 <- gsub("obama"," ",corpus2)
 corpus2 <- gsub("president"," ",corpus2)
@@ -123,14 +122,6 @@ corpus2 <- gsub("president"," ",corpus2)
 ### 文字雲
 
 由文字雲可以看出歐巴馬於四段時的發文內容趨勢，從中觀察各時期關注的議題有何差異。
-
-1. 任職前(Pre-Presidency)：
-
-2. 第一任期(First Term)：
-
-3. 第二任期(Second Term)：
-
-4. 卸任後(Post-Presidency)：
 
 ```{r wordcloud}
 #Create Comparison Word Cloud: create corpus vector
@@ -144,5 +135,22 @@ m <- as.matrix(tdm)
 colnames(m) <- c("Pre-Presidency", "First Term", "Second Term", "Post-Presidency")
 
 #Create Comparison Word Cloud
-comparison.cloud(m, max.words=200,scale=c(2,.5),random.order=FALSE,title.size=1.5)
+comparison.cloud(m, max.words=200,scale=c(1.5,.3),random.order=FALSE,title.size=1.5)
 ```
+
+1. **任職前(Pre-Presidency)**：
+
+    時間設定為歐巴馬在伊利諾州首府春田市正式宣布參選至選舉結果公告當日，而在這之前歐巴馬曾任伊利諾州參議員與聯邦參議員，可以看出常見的關鍵字"senator", "supporters", "campaign"等正可呼應這樣的時代背景。
+
+2. **第一任期(First Term)**：
+
+    包含"friends", "share", "make", "plan"等國家建設相關字眼，另因時間涵蓋到2012年總統大選，也可以看出"election"及前共和黨總統候選人"romney"出現頻率也相當高。
+
+3. **第二任期(Second Term)**：
+
+    歐巴馬於第二任期間一再強調氣候變遷議題，反映在大量的關鍵字"climate", "change"上。另外，2016年歐巴馬提名自由派法官賈蘭德(Garland)擔任美國最高法院大法官一事也獲一定的重視，從關鍵字"supreme", "court", "judge", "garland"中可以略見一斑。
+
+4. **卸任後(Post-Presidency)**：
+
+    關鍵字"young", "people", "country"顯示即便卸任後，歐巴馬依舊相當關心美國國民，尤其是年輕人的發展。而今年九月美國同婚推手溫莎伊迪絲(Edith “Edie” Windsor)辭世，歐巴馬發文緬懷盛讚其貢獻獲廣大回響，也可以從關鍵字"edie"看出。
+    
