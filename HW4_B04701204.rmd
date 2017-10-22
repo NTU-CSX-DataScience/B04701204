@@ -37,12 +37,15 @@ require(Rfacebook)
 
 透過 fbOAuth function 取得 access token，再透過 token 取得歐巴馬於四段時期的發文。為減省作業，因此取百篇內的貼文。     
 
-# 這裡有問題!! R Markdown出現"oauth_listener() needs an interactive environment",經查詢可能是因為找不到".httr-oauth file"。
-# 請問是fb_oauth沒有存進記憶體嗎?不太懂這是甚麼意思。
+# 後來發現因為之前取得過token並存取後，直接用load就沒有問題了，不知道這是為什麼？
 
 ```{r crawler}
 # generate a 'long-lived' token using the fbOAuth function
-fb_oauth <- fbOAuth(app_id="1569896156438201", app_secret="8b593e1538dc2aae0ca986806bdd4093",extended_permissions = TRUE)
+#fb_oauth <- fbOAuth(app_id="1569896156438201", app_secret="8b593e1538dc2aae0ca986806bdd4093",extended_permissions = TRUE)
+
+# save fb_oauth for future use
+#save(fb_oauth, file="fb_oauth")
+load("fb_oauth")
 
 # set token
 token = fb_oauth
