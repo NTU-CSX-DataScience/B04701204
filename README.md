@@ -11,4 +11,4 @@
             (2) 比較歐巴馬於總統任期前後的臉抒發文內容：
 https://ntu-csx-datascience.github.io/B04701204/HW4_B04701204.html
 
-4. 作業四 TF-IDF & Kmeans：
+4. 作業四 TF-IDF & Kmeans：https://ntu-csx-datascience.github.io/B04701204/HW_5.zip
