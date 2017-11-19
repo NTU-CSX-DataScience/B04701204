@@ -1,0 +1,102 @@
+---
+title: "HW5_B04701204"
+author: "B04701204"
+date: "2017年11月19日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##題目：比較美國58屆總統就職演說-文本 K-Means Clustering
+
+### 資料輸入 - 爬蟲結果
+
+完成網路爬蟲，從 The American Presidency Project 網站 <http://www.presidency.ucsb.edu/inaugurals.php> 上取得58屆總統的名字和就職演說的連結，再透過 `InaugTestFunction` 取得連結內就職演說文字，經文本清理存成`TestMining.R`。
+
+```{r source}
+Sys.setlocale(category='LC_ALL', locale='C')
+source("TextMining.R")
+```
+
+### 套件執行
+```{r library}
+library(Matrix)
+library(stats)
+library(cluster)
+library(devtools)
+#install_github("vqv/ggbiplot")
+library(ggbiplot)
+```
+
+### TF-IDF演算法
+
+製作 TF-IDF 詞頻矩陣。
+
+```{r tfidf}
+tdm <- TermDocumentMatrix(corpus2)
+
+N = tdm$ncol
+tf <- apply(tdm, 2, sum) 
+idfCal <- function(word_doc){ log2(  N / nnzero(word_doc) ) }
+idf <- apply(tdm, 1, idfCal)
+
+doc.tfidf <- as.matrix(tdm)
+for(i in 1:nrow(tdm)){
+  for(j in 1:ncol(tdm)){
+    doc.tfidf[i,j] <- (doc.tfidf[i,j] / tf[j]) * idf[i]
+  }
+}
+```
+
+### Kmeans Clustering
+
+因為要比較58屆總統就職演說的同/異質性，資料應是58屆總統就職演說的文本，而不是詞語，因此將詞頻矩陣`doc.tfidf`先行轉置，存成`data`。
+接著，透過 Elbow Method 找出最佳集群數目（optimal number of clusters）。由於沒有明確的 elbow ，因此我找出`num_clusters`使組內平方和（wss）小於0.5，暫定其為最佳集群數目。
+
+```{r kmeans1}
+#Transpose dataframe
+data = t(doc.tfidf)
+
+#K-Means clustering: elbow method to determine optimum numbers of clusters
+wss <- 2:58
+for (i in 2:58) 
+{
+  wss[i] <- sum(kmeans(data, centers=i, nstart = 20, algorithm = c("Lloyd"))$withinss)
+}
+
+plot(2:58, wss[2:58], type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+
+num_clusters = length(which(unlist(wss) > 0.5)) + 1
+num_clusters
+```
+
+從上述假設，得到最佳集群數目為10。將58屆總統就職演說作 K-Means Clustering，分成10群。
+
+```{r kmeans2}
+#K-Means clustering: perform K-Means clustering
+kmeansOut = kmeans(data, num_clusters, nstart = 20, algorithm = c("Lloyd")) 
+
+testdata = data
+
+#K-Means clustering: perform PCA
+data.pca = prcomp(data)
+data.kmeans = as.factor(kmeansOut$cluster)
+
+kmeans_clustering <- as.data.frame(data.kmeans)
+kmeans_clustering
+```
+
+以視覺化呈現 K-Means Clustering 結果。可以看出絕大多數的就職演說集中在第三集群，其餘零星分布，沒有明顯的分群現象，顯示文本內容同質性高，未受時代風潮、當代重要議題等影響。
+
+```{r kmeans3}
+#K-Means clustering: biplot for Principal Components
+g <- ggbiplot(data.pca, obs.scale = 1, var.scale = 1, 
+              groups = data.kmeans, ellipse = TRUE, 
+              circle = TRUE, labels = rownames(data))
+g <- g + scale_color_discrete(name = '')
+g <- g + theme(legend.direction = 'horizontal', 
+               legend.position = 'top')
+print(g)
+```
