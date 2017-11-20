@@ -9,4 +9,4 @@
   (1) IMDb 2017年500大熱門電影內容呈現：https://ntu-csx-datascience.github.io/B04701204/HW3_B04701204.html
   (2) 比較歐巴馬於總統任期前後的臉抒發文內容：https://ntu-csx-datascience.github.io/B04701204/HW4_B04701204.html
 
-4. 作業四 TF-IDF & Kmeans：HW_5.zip (Rmarkdown待補)
+4. 作業四 TF-IDF & Kmeans：https://ntu-csx-datascience.github.io/B04701204/HW5_B04701204.html
