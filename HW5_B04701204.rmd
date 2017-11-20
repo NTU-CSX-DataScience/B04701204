@@ -68,11 +68,11 @@ for (i in 2:58)
 
 plot(2:58, wss[2:58], type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
 
-num_clusters = length(which(unlist(wss) > 0.5)) + 1
+num_clusters = length(which(unlist(wss) > 0.5)) +1
 num_clusters
 ```
 
-從上述假設，得到最佳集群數目為10。將58屆總統就職演說作 K-Means Clustering，分成10群。
+從上述假設，得到最佳集群數目，將58屆總統就職演說作 K-Means Clustering。
 
 ```{r kmeans2}
 #K-Means clustering: perform K-Means clustering
@@ -88,7 +88,7 @@ kmeans_clustering <- as.data.frame(data.kmeans)
 kmeans_clustering
 ```
 
-以視覺化呈現 K-Means Clustering 結果。可以看出絕大多數的就職演說集中在第三集群，其餘零星分布，沒有明顯的分群現象，顯示文本內容同質性高，未受時代風潮、當代重要議題等影響。
+以視覺化呈現 K-Means Clustering 結果。可以看出絕大多數的就職演說集中在同一集群，其餘零星分布，沒有明顯的分群現象，顯示文本內容同質性高，未受時代風潮、當代重要議題等影響。
 
 ```{r kmeans3}
 #K-Means clustering: biplot for Principal Components
