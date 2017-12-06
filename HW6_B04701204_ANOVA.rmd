@@ -1,0 +1,95 @@
+---
+title: "HW6_B04701204_ANOVA"
+author: "B04701204"
+date: "2017年12月6日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##題目：探討不同酒種是否影響其中的類黃酮含量 - ANOVA 分析
+
+### 資料輸入 - Wine Dataset
+
+從 LIBSVM Data 取得 wine dataset (<https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/multiclass/wine.scale>)。
+透過`read.libsvm.R` 讀入資料並整理之。
+
+```{r source}
+#read in the data and convert to dataframe
+source( 'read.libsvm.R' )
+```
+
+```{r read}
+wine = read.libsvm( 'wine.scale', 13 )
+wine = as.data.frame(wine)
+
+#reassign attributes
+names(wine) = c("type","alc","acid","ash","alk","mag","phenols","flav","nonflav","proanth","color","hue","OD","proline")
+
+#encode wine type as factor
+wine$type = as.factor(wine$type)
+```
+
+### 套件執行
+```{r library}
+require(ggplot2)
+library(Hmisc)
+library(base)
+```
+
+### 繪圖
+
+根據英美的醫學報告<https://www.ncbi.nlm.nih.gov/pubmed/28714503>，男性經常食用富含類黃酮(flavonoids)的食品，
+可顯著降低罹患帕金森氏症的風險。透過ANOVA分析，本題將就 wine dataset探討不同酒種對類黃酮含量的影響。在進行分析前，
+先繪製盒鬚圖(boxplot)與平均值加上信賴區間(interval plot)以觀察類黃酮含量在不同酒種間的分布。
+
+#### 盒鬚圖 (boxplot)
+
+製作盒鬚圖。
+
+```{r boxplot}
+#set black-white theme
+old <- theme_set(theme_bw())
+
+#plot boxplot
+ggplot(data = wine, aes(x = type, y = flav)) +
+  geom_boxplot() + coord_flip() +
+  labs( y = 'Flavanoids', x = 'Wine Type', 
+        title = 'Flavanoids in Wine')
+```
+
+#### 平均值加上信賴區間 (interval plot)
+
+```{r intplot}
+#compute standardized mean of flav for different wine types
+tapply(wine$flav, wine$type, mean)
+
+#plot interval plot
+ggplot(data = wine, 
+       aes(x = type, y = flav))+
+  stat_summary(fun.data = 'mean_cl_boot', size = 1) +
+  scale_y_continuous(breaks = seq(-1, 0.2, by = 0.2))+
+  geom_hline(yintercept = mean(wine$flav) , 
+             linetype = 'dotted') +
+  labs(x = 'Wine Type', y = 'Flavanoids') +
+  coord_flip()
+```
+
+從上述兩張繪圖，可以看出類黃酮含量因酒種不同而有顯著的差異。
+
+### ANOVA 分析
+
+因為有三各類別的酒種，因此採用 ANOVA 分析探討類黃酮含量(連續型之因變量)與酒種(類別型之自變量)的關係，
+再次檢驗上述繪圖的結論。
+
+H0：mu1 = mu2 = mu3 ，表示樣本平均數的差異無顯著性，即酒種對類黃酮含量無顯著影響。
+
+```{r anova}
+#ANOVA test
+anova(m1 <- lm(flav ~ type, data = wine))
+summary(m1)$r.squared
+```
+
+p-value=2.2e-16<0.05故 reject null hypothesis H0, 證實類黃酮含量因酒種不同而有顯著差異，呼應上述繪圖的結論。
