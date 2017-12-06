@@ -11,4 +11,7 @@
 
 4. 作業四 TF-IDF & Kmeans：https://ntu-csx-datascience.github.io/B04701204/HW5_B04701204.html
 
-5. Shiny test: https://chianjrchiu.shinyapps.io/myshinyapp/
+5. 作業五 ANOVA：https://ntu-csx-datascience.github.io/B04701204/HW6_B04701204_ANOVA.html
+
+Practice：
+Shiny test: https://chianjrchiu.shinyapps.io/myshinyapp/
