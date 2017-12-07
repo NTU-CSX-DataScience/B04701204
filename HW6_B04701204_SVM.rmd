@@ -1,5 +1,5 @@
 ---
-title: "HW_B04701204_SVM"
+title: "HW6_B04701204_SVM"
 author: "B04701204"
 date: "2017年12月7日"
 output: html_document
