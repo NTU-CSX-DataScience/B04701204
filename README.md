@@ -12,7 +12,9 @@
 4. 作業四 TF-IDF & Kmeans：https://ntu-csx-datascience.github.io/B04701204/HW5_B04701204.html
 
 5. 作業五 
+
 SVM：https://ntu-csx-datascience.github.io/B04701204/HW6_B04701204_SVM.html
+
 ANOVA：https://ntu-csx-datascience.github.io/B04701204/HW6_B04701204_ANOVA.html
 
 Practice：
