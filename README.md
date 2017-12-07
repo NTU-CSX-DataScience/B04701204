@@ -17,5 +17,5 @@ SVM：https://ntu-csx-datascience.github.io/B04701204/HW6_B04701204_SVM.html
 
 ANOVA：https://ntu-csx-datascience.github.io/B04701204/HW6_B04701204_ANOVA.html
 
-Practice：
+Practice：  
 Shiny test: https://chianjrchiu.shinyapps.io/myshinyapp/
